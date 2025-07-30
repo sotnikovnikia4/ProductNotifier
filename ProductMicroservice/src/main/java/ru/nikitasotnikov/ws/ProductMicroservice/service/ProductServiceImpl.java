@@ -1,5 +1,6 @@
 package ru.nikitasotnikov.ws.ProductMicroservice.service;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,19 +31,15 @@ public class ProductServiceImpl implements ProductService{
                 createProductDto.getPrice(),
                 createProductDto.getQuantity());
 
-//        CompletableFuture<SendResult<String, ProductCreatedEvent>> future = kafkaTemplate.send("product-created-events-topic", productId, productCreatedEvent);
-//
-//        future.whenComplete((result, exception) -> {
-//            if(exception != null){
-//                log.error("Failed to send message: {}", exception.getMessage());
-//            }
-//            else{
-//                log.info("Message sent successfully: {}", result.getRecordMetadata());
-//            }
-//        });
+        ProducerRecord<String, ProductCreatedEvent> record = new ProducerRecord<>(
+                "product-created-events-topic",
+                productId,
+                productCreatedEvent
+        );
 
-        SendResult<String, ProductCreatedEvent> result = kafkaTemplate
-                .send("product-created-events-topic", productId, productCreatedEvent).get();
+        record.headers().add("messageId", "qwerty".getBytes());
+
+        SendResult<String, ProductCreatedEvent> result = kafkaTemplate.send(record).get();
 
         log.info("Topic: {}", result.getRecordMetadata().topic());
         log.info("Partition: {}", result.getRecordMetadata().partition());

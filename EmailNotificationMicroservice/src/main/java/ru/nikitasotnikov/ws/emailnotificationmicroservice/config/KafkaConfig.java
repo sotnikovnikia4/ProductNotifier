@@ -44,6 +44,7 @@ public class KafkaConfig {
 
         props.put(JsonDeserializer.TRUSTED_PACKAGES, environment.getProperty("spring.kafka.consumer.properties.spring.json.trusted.packages"));
         props.put(ConsumerConfig.GROUP_ID_CONFIG, environment.getProperty("consumer.group-id"));
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, environment.getProperty("spring.kafka.consumer.auto-offset-reset"));
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
